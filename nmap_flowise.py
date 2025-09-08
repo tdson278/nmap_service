@@ -26,15 +26,23 @@ def get_nmap_path() -> str:
 
 
 def build_cmd(nmap_bin: str, req: ScanRequest) -> list:
-    args = [nmap_bin, "-oX", "-"]
+    """
+    Xây dựng command để chạy Nmap.
+    Luôn dùng TCP connect scan (-sT), không dùng raw socket.
+    Chỉ quét port được chỉ định (req.ports).
+    """
+    args = [nmap_bin, "-oX", "-", "-sT", "-T4", "-Pn", "--reason"]
 
-    if req.full:
-        # chỉ scan port và service, bỏ aggressive (-A) và OS detect (-O)
-        args += ["-sT", "-T4", "-Pn", "--top-ports", "1000", "--reason"]
-    else:
-        args += ["-sT", "-sV", "-sC", "-Pn", "-T4", "--reason", "-p", req.ports]
+    # Quét các port do user chỉ định, hoặc mặc định 1-1024
+    args += ["-p", req.ports]
 
+    # Nếu không full, thêm service/version scan và script scan
+    if not req.full:
+        args += ["-sV", "-sC"]
+
+    # Thêm target IP cuối cùng
     args.append(req.target)
+
     return args
 
 def run_nmap(cmd: list, timeout: int = 600):
