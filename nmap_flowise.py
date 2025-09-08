@@ -29,8 +29,8 @@ def build_cmd(nmap_bin: str, req: ScanRequest) -> list:
     args = [nmap_bin, "-oX", "-"]
 
     if req.full:
-        # Thay -sS bằng -sT để chạy trong container không root
-        args += ["-sT", "-A", "-T4", "-Pn", "--top-ports", "1000", "--reason"]
+        # chỉ scan port và service, bỏ aggressive (-A) và OS detect (-O)
+        args += ["-sT", "-T4", "-Pn", "--top-ports", "1000", "--reason"]
     else:
         args += ["-sT", "-sV", "-sC", "-Pn", "-T4", "--reason", "-p", req.ports]
 
