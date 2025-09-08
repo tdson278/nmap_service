@@ -29,12 +29,11 @@ def build_cmd(nmap_bin: str, req: ScanRequest) -> list:
     args = [nmap_bin, "-oX", "-"]
 
     if req.full:
-        # Quét toàn diện: top 1000 ports + service detect + OS detect
-        args += ["-sS", "-A", "-T4", "-Pn", "--top-ports", "1000", "--reason"]
+        # Thay -sS bằng -sT để chạy trong container không root
+        args += ["-sT", "-A", "-T4", "-Pn", "--top-ports", "1000", "--reason"]
     else:
-        args += ["-sS", "-sV", "-sC", "-Pn", "-T4", "--reason", "-p", req.ports]
+        args += ["-sT", "-sV", "-sC", "-Pn", "-T4", "--reason", "-p", req.ports]
 
-    # 👇 BẮT BUỘC thêm target ở cuối
     args.append(req.target)
     return args
 
